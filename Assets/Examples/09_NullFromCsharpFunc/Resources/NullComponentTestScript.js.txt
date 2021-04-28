@@ -1,0 +1,38 @@
+const speed = 10;
+const CS = require('csharp');
+const puerts = require("puerts");
+
+class NullComponentTestScript {
+    constructor(bindTo) {
+        this.bindTo = bindTo;
+        this.bindTo.JsStart = () => this.onStart();
+    }
+    
+    onStart() {
+        console.log('gameObject : ' + this.bindTo.gameObject);
+        
+        // 1. Camera is valid Component in this GameObject.
+        let cameraComponent = this.bindTo.gameObject.GetComponent(puerts.$typeof(CS.UnityEngine.Camera));
+        console.log('camera : ' + cameraComponent);
+
+        // 2. Light is not exist Component in this GameObject.
+        let lightComponent = this.bindTo.gameObject.GetComponent(puerts.$typeof(CS.UnityEngine.Light));
+        // print : light(Invalid) : null, isNull? false
+        console.log('light(Invalid) : ' + lightComponent + ", isNull? " + (lightComponent == null));
+
+        // 3. I expected {lightComponent} is null but it is not null. It is default(Light).
+        try {
+            for(let key in lightComponent) {
+                // It can print a log about key/value.
+                console.log('light object : key=' + key + ', value=' + lightComponent[key]);
+            }
+        } catch (e) {
+            // Exception is occured when access to component that is not attached. from PuerTS.
+            console.error(e);
+        }
+    }
+}
+
+exports.init = function(bindTo) {
+    new NullComponentTestScript(bindTo);
+}
